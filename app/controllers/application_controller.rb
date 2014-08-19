@@ -4,9 +4,10 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   def respond_to_create params
-    thing    = params[:thing]
-    redirect = params[:redirect] ? params[:redirect] : thing
-    name     = params[:name]     ? params[:name]     : thing.class.to_s
+    @params = parse_params_for_respond_to params
+    thing    = @params[:thing]
+    redirect = @params[:redirect]
+    name     = @params[:name]
 
     respond_to do |format|
       if thing.save
@@ -20,9 +21,10 @@ class ApplicationController < ActionController::Base
   end
 
   def respond_to_update params
-    thing    = params[:thing]
-    redirect = params[:redirect] ? params[:redirect] : thing
-    name     = params[:name]     ? params[:name]     : thing.class.to_s
+    @params = parse_params_for_respond_to params
+    thing    = @params[:thing]
+    redirect = @params[:redirect]
+    name     = @params[:name]
     thing_params = params[:thing_params] ? params[:thing_params] : eval(thing.class.to_s.downcase.sub(/$/, "_params"))
 
     respond_to do |format|
@@ -37,13 +39,26 @@ class ApplicationController < ActionController::Base
   end
 
   def respond_to_destroy params
-    thing    = params[:thing]
-    redirect = params[:redirect]
-    name     = params[:name]     ? params[:name]     : thing.class.to_s
+    @params = parse_params_for_respond_to params
+    thing    = @params[:thing]
+    redirect = @params[:redirect]
+    name     = @params[:name]
 
     respond_to do |format|
       format.html { redirect_to redirect, notice: "#{name} was successfully destroyed." }
       format.json { head :no_content }
     end
   end
+
+
+  def parse_params_for_respond_to params
+    $params = params
+    $thing  = $params[:thing]
+    $params[:redirect]     ||= $thing
+    $params[:name]         ||= $thing.class.to_s
+    #$params[:thing_params] ||= eval($thing.class.to_s.downcase.sub(/$/, "_params"))
+    $params
+  end
+    
+
 end
