@@ -3,29 +3,29 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
-  def respond_to_create params
-    @params = parse_params_for_respond_to params
-    @params[:render_on_fail] = :new
-    @params[:method] = 'save'
+  def respond_to_create args
+    parse_args_for_respond_to args
+    args[:render_on_fail] = :new
+    args[:method] = 'save'
 
-    helper_for_respond_to @params
+    helper_for_respond_to args
   end
 
-  def respond_to_update params
-    @params = parse_params_for_respond_to params
-    #FIXME we probably don't need this conditional - noone passes method_params
-    #@params[:method_params] = params[:method_params] ? params[:method_params] : eval(@params[:thing].class.to_s.downcase.sub(/$/, "_params"))
-    @params[:method_params] = eval(@params[:thing].class.to_s.downcase.sub(/$/, "_params"))
-    @params[:render_on_fail] = :edit
-    @params[:method] = 'update'
+  def respond_to_update args
+    args = parse_args_for_respond_to args
+    #FIXME we probably don't need this conditional - noone passes method_args
+    #@args[:method_args] = args[:method_args] ? args[:method_args] : eval(@args[:thing].class.to_s.downcase.sub(/$/, "_args"))
+    args[:method_args] = eval(args[:thing].class.to_s.downcase.sub(/$/, "_params"))
+    args[:render_on_fail] = :edit
+    args[:method] = 'update'
 
-    helper_for_respond_to @params
+    helper_for_respond_to args
 
-#    thing    = @params[:thing]
-#    redirect = @params[:redirect]
-#    name     = @params[:name]
+#    thing    = @args[:thing]
+#    redirect = @args[:redirect]
+#    name     = @args[:name]
 #    respond_to do |format|
-#      if thing.update(method_params)
+#      if thing.update(method_args)
 #        format.html { redirect_to redirect, notice: "#{name} was successfully updated." }
 #        format.json { render :show, status: :created, location: redirect }
 #      else
@@ -35,11 +35,11 @@ class ApplicationController < ActionController::Base
 #    end
   end
 
-  def respond_to_destroy params
-    @params = parse_params_for_respond_to params
-    thing    = @params[:thing]
-    redirect = @params[:redirect]
-    name     = @params[:name]
+  def respond_to_destroy args
+    args = parse_args_for_respond_to args
+    thing    = args[:thing]
+    redirect = args[:redirect]
+    name     = args[:name]
 
     respond_to do |format|
       format.html { redirect_to redirect, notice: "#{name} was successfully destroyed." }
@@ -48,29 +48,26 @@ class ApplicationController < ActionController::Base
   end
 
   private
-  
-  def helper_for_respond_to params
-    @p = params
-    @p[:method_params] ||= nil
-    @method = @p[:thing].method "#{@p[:method]}"
+
+  def helper_for_respond_to args
+    args[:method_args] ||= {}
     respond_to do |format|
-      if @method.call(@p[:method_params])
-        format.html { redirect_to @p[:redirect], notice: "#{@p[:name]} was successfully created." }
-        format.json { render :show, status: :created, location: @p[:redirect] }
+      if args[:thing].send(args[:method], args[:method_args])
+        format.html { redirect_to args[:redirect], notice: "#{args[:name]} was successfully created." }
+        format.json { render :show, status: :created, location: args[:redirect] }
       else
-        format.html { render @p[:render_on_fail] }
-        format.json { render json: @p[:thing].errors, status: :unprocessable_entity }
+        format.html { render args[:render_on_fail] }
+        format.json { render json: args[:thing].errors, status: :unprocessable_entity }
       end
     end
   end
 
-  def parse_params_for_respond_to params
-    $params = params
-    $thing  = $params[:thing]
-    $params[:redirect]     ||= $thing
-    $params[:name]         ||= $thing.class.to_s
-    #$params[:method_params] ||= eval($thing.class.to_s.downcase.sub(/$/, "_params"))
-    $params
+  def parse_args_for_respond_to args
+    thing  = args[:thing]
+    args[:redirect]     ||= thing
+    args[:name]         ||= thing.class.to_s
+    #args[:method_args] ||= eval($thing.class.to_s.downcase.sub(/$/, "_args"))
+    args
   end
 
 end
