@@ -83,3 +83,4 @@ gem "twitter-bootstrap-rails"
 gem 'ratyrate', :github => 'wazery/ratyrate'            #star ratings 
 gem 'will_paginate', '~> 3.0'             #paginate
 gem 'will_paginate-bootstrap'             #make pagination pretty
+gem 'angularjs-rails'                  # for our ajax stuff
