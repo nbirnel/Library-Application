@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
         format.json { json_success_says :created }
       else
         format.html { render :new }
-        format.json { render json: @item.errors, status: :unprocessable_entity }
+        format.json { json_failure_says }
       end
     end
   end
@@ -36,7 +36,7 @@ class ApplicationController < ActionController::Base
         format.json { json_success_says :ok }
       else
         format.html { render :edit }
-        format.json { render json: @item.errors, status: :unprocessable_entity }
+        format.json { json_failure_says }
       end
     end
   end
@@ -53,6 +53,10 @@ class ApplicationController < ActionController::Base
 
   def json_success_says status
     render :show, status: status, location: @redirect
+  end
+
+  def json_failure_says 
+    render json: @item.errors, status: :unprocessable_entity
   end
 
 end
