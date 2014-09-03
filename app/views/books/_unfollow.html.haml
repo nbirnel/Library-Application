@@ -1,3 +1,5 @@
 = form_for(current_user.subscriptions.find_by(followed_id: @book.id), 
+  - if f.following_reviews
+    = link_to 'No reviews', 
   html: { method: :delete }) do |f|
   = f.submit "Unfollow", class: "btn btn-large"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140903041635) do
+ActiveRecord::Schema.define(version: 20140903060349) do
 
   create_table "authors", force: true do |t|
     t.string   "given_name"
@@ -63,6 +63,8 @@ ActiveRecord::Schema.define(version: 20140903041635) do
     t.integer  "followed_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "following_reviews", default: true
+    t.boolean  "following_ratings", default: true
   end
 
   create_table "taggings", force: true do |t|
